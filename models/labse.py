@@ -18,8 +18,7 @@ class LaBSEModel:
         C=1.0,
     ):
         print("Loading LaBSE model...")
-        self.encoder = SentenceTransformer(model_name)
-
+        self.encoder = SentenceTransformer(model_name, device="cpu")
         self.clf = LogisticRegression(max_iter=1000, C=C)
         self.is_fitted = False
 
