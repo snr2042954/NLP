@@ -6,6 +6,7 @@ Simple framework to compare different models for multilingual sentiment classifi
 - TF-IDF + Logistic Regression
 - BERT (bert-base-multilingual-cased)
 - LaBSE + Logistic Regression
+- fasttext (not working yet)
 
 ## Features
 - Train on one language, evaluate on multiple
