@@ -2,6 +2,11 @@
 
 Simple framework to compare different models for multilingual sentiment classification.
 
+## Runtime
+
+python3.14
+dependencies in requirements.txt
+
 ## Models
 - TF-IDF + Logistic Regression
 - BERT (bert-base-multilingual-cased)

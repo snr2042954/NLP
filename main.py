@@ -8,7 +8,7 @@ from utils.evaluation import print_metrics
 
 from models.baseline_tfidf import BaselineTFIDF
 from models.BERT import BERTModel
-from models.fasttext_model import FastTextModel
+# from models.fasttext_model import FastTextModel
 from models.labse import LaBSEModel
 
 
@@ -100,9 +100,9 @@ class ExperimentRunner:
 
 if __name__ == "__main__":
     runner = ExperimentRunner(
-        model_name="bert",   # "tfidf" | "bert" | "fasttext" | "labse"
+        model_name="tfidf",   # "tfidf" | "bert" | "fasttext" | "labse"
         train_language="english",
-        languages=("english", "german", "chinese"),
+        languages=("english", "german", "arabic", "portuguese"),
         train_frac=0.05,
         test_frac=0.05,
     )
