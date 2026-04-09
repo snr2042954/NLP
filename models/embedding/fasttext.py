@@ -10,6 +10,7 @@ import shutil
 import urllib.request
 import numpy as np
 import fasttext
+from tqdm import tqdm
 
 from utils.preprocessing import apply_preprocessing
 
@@ -37,7 +38,12 @@ def download_model(lang_code):
     url = f"https://dl.fbaipublicfiles.com/fasttext/vectors-crawl/cc.{lang_code}.300.bin.gz"
     print(f"Downloading FastText model for {lang_code}...")
 
-    urllib.request.urlretrieve(url, gz_path)
+    with tqdm(unit="B", unit_scale=True, unit_divisor=1024, miniters=1, desc=f"cc.{lang_code}.300.bin.gz") as bar:
+        def reporthook(count, block_size, total_size):
+            if bar.total is None:
+                bar.total = total_size
+            bar.update(block_size)
+        urllib.request.urlretrieve(url, gz_path, reporthook=reporthook)
 
     with gzip.open(gz_path, "rb") as f_in, open(bin_path, "wb") as f_out:
         shutil.copyfileobj(f_in, f_out)
