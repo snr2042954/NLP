@@ -27,7 +27,8 @@ def compute_metrics(y_true, y_pred):
     precision, recall, f1, _ = precision_recall_fscore_support(
         y_true,
         y_pred,
-        average="macro"  # important for class balance
+        average="macro",  # important for class balance
+        zero_division=0,
     )
 
     return {

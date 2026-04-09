@@ -56,3 +56,23 @@ project/
 
 Models run on CPU (GPU not supported in this setup)
 First run downloads pretrained models (BERT / LaBSE)
+
+
+
+
+
+## Models
+
+### Embedding
+
+* BERT
+* Fasttext
+* Tfidf
+* LaBSE
+
+### Classifier
+
+* Bidirectional LSTM
+* SVM
+* logistic regression
+
