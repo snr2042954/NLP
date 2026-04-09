@@ -1,78 +1,94 @@
 # Multilingual Sentiment Analysis
 
-Simple framework to compare different models for multilingual sentiment classification.
+Modular framework for comparing multilingual sentiment analysis approaches.
 
 ## Runtime
 
-python3.14
-dependencies in requirements.txt
+- Python 3.14
+- Dependencies are in `requirements.txt`
 
-## Models
-- TF-IDF + Logistic Regression
-- BERT (bert-base-multilingual-cased)
-- LaBSE + Logistic Regression
-- fasttext (not working yet)
+## Current model design
+
+The codebase now separates embedding generation from classification:
+
+- `models/embedding/`
+  - `tfidf.py` — `TFIDFEmbedder`
+  - `bert.py` — `BERTEmbedder`
+  - `labse.py` — `LaBSEEmbedder`
+  - `fasttext.py` — `FastTextEmbedder` (optional)
+- `models/classification/`
+  - `logistic_regression.py` — `LogisticRegressionClassifier`
+
+This allows easy mixing of any embedder with any classifier.
+
+## Supported combinations
+
+- TF-IDF embeddings + Logistic Regression
+- BERT embeddings + Logistic Regression
+- LaBSE embeddings + Logistic Regression
+- FastText embeddings + Logistic Regression (Windows compatibility is limited)
+
+## FastText on Windows
+
+FastText is not reliably installable on native Windows in many environments. If you are on Windows:
+
+- use `TFIDFEmbedder`, `BERTEmbedder`, or `LaBSEEmbedder`
+- or run the project inside WSL / Linux if you need FastText
 
 ## Features
-- Train on one language, evaluate on multiple
-- Shared preprocessing and evaluation
-- Easy model switching via config
+
+- Train on one language, evaluate across multiple languages
+- Shared preprocessing and evaluation pipeline
+- Modular embedder + classifier architecture
 
 ## Usage
 
-Run the main pipeline:
+Run the main experiment:
 
 ```bash
 python main.py
 ```
 
-Edit main.py to change:
+To change the experiment, edit `main.py` and update the chosen embedder and classifier instances.
 
-* model (tfidf, bert, labse)
-* training language
-* dataset fraction
+Example:
 
-## Structure
+```python
+from models.embedding.tfidf import TFIDFEmbedder
+from models.classification.logistic_regression import LogisticRegressionClassifier
+
+embedder = TFIDFEmbedder()
+classifier = LogisticRegressionClassifier()
 ```
-project/
+
+Then pass them into `ExperimentRunner`.
+
+## Repository structure
+
+```
+NLP/
 ├── models/
-│   ├── data/                  # (ignored) downloaded model files from fasttext
-│   ├── baseline_tfidf.py
-│   ├── BERT.py
-│   ├── fasttext_model.py
-│   └── labse.py
-│
+│   ├── classification/
+│   │   └── logistic_regression.py
+│   └── embedding/
+│       ├── bert.py
+│       ├── fasttext.py
+│       ├── labse.py
+│       └── tfidf.py
 ├── utils/
 │   ├── evaluation.py
 │   ├── load_data.py
 │   └── preprocessing.py
-│
 ├── main.py
 ├── requirements.txt
-├── README.md
+└── README.md
 ```
 
 ## Notes
 
-Models run on CPU (GPU not supported in this setup)
-First run downloads pretrained models (BERT / LaBSE)
+- Models are configured for CPU execution.
+- The first run may download pretrained models for BERT and LaBSE.
+- Evaluation now suppresses undefined precision warnings by using `zero_division=0` in metric computation.
 
 
-
-
-
-## Models
-
-### Embedding
-
-* BERT
-* Fasttext
-* Tfidf
-* LaBSE
-
-### Classifier
-
-* Bidirectional LSTM
-* SVM
-* logistic regression
 
