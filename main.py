@@ -160,7 +160,7 @@ def save_results_to_csv(all_results, filepath="results.csv"):
                 writer.writerow(row)
 
 
-def run_all():
+def run_all(test_frac,train_frac):
     """This function calls the main experiment runners:
     it checks all combinations of embedders and classifiers and saves the results into a dictionary.
     for every embedder-classifier combination it takes as the train language each of the languages in the dataset and evaluates on all languages.
@@ -191,8 +191,8 @@ def run_all():
                     classifier=classifier,
                     train_language=train_lang,
                     languages=("english", "german", "arabic", "portuguese"),
-                    train_frac=0.05,
-                    test_frac=0.05,
+                    train_frac=train_frac,
+                    test_frac=test_frac,
                 )
                 results = runner.run()
                 all_results[(type(embedder).__name__, type(classifier).__name__, train_lang)] = results
@@ -201,7 +201,13 @@ def run_all():
 
 
 if __name__ == "__main__":
-    results = run_all()
-    output_path = "results.csv"
-    save_results_to_csv(results, output_path)
-    print(f"\nSaved results to {os.path.abspath(output_path)}")
+
+    # CONGIGURABLES
+    TEST_FRACTION = 0.05
+    TRAIN_FRACTION = 0.05
+    OUTPUT_PATH = "results.csv"
+
+    # Run all experiments and save results to CSV
+    results = run_all(test_frac=TEST_FRACTION, train_frac=TRAIN_FRACTION)
+    save_results_to_csv(results, OUTPUT_PATH)
+    print(f"\nSaved results to {os.path.abspath(OUTPUT_PATH)}")
