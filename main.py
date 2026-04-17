@@ -10,6 +10,9 @@ from models.embedding.tfidf import TFIDFEmbedder
 from models.embedding.bert import BERTEmbedder
 from models.embedding.labse import LaBSEEmbedder
 from models.classification.logistic_regression import LogisticRegressionClassifier
+from models.classification.bilstm import BiLSTMClassifier
+from models.classification.mlp import MLPClassifier
+from models.classification.xlmr_head import XLMRClassifierHead
 
 # FastText is not compatible with Windows
 try:
@@ -126,8 +129,8 @@ class ExperimentRunner:
 
 if __name__ == "__main__":
 
-    embedder = BERTEmbedder() # TFIDFEmbedder() | BERTEmbedder() | LaBSEEmbedder() | FastTextEmbedder()
-    classifier = LogisticRegressionClassifier()
+    embedder = FastTextEmbedder() # TFIDFEmbedder() | BERTEmbedder() | LaBSEEmbedder() | FastTextEmbedder()
+    classifier = BiLSTMClassifier() #  XLMRClassifierHead() | MLPClassifier() | BiLSTMClassifier() | LogisticRegressionClassifier()
 
     runner = ExperimentRunner(
         embedder=embedder,
