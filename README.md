@@ -2,44 +2,35 @@
 
 Modular framework for comparing multilingual sentiment analysis approaches.
 
+## Overview
+
+This repository separates embedding generation from classification so you can compare combinations of multilingual embedders and classifiers.
+
 ## Runtime
 
 - Python 3.14
-- Dependencies are in `requirements.txt`
+- Dependencies: `requirements.txt`
 
-## Current model design
+## Components
 
-The codebase now separates embedding generation from classification:
+- `main.py` — runs experiments and saves `results.csv`
+- `models/embedding/` — embedder implementations
+  - `tfidf.py` — TF-IDF
+  - `bert.py` — BERT
+  - `labse.py` — LaBSE
+  - `fasttext.py` — FastText (optional)
+- `models/classification/` — classifier implementations
+  - `logistic_regression.py`
+  - `mlp.py`
+  - `xlmr_head.py`
+- `utils/` — shared utilities
+  - `load_data.py`
+  - `preprocessing.py`
+  - `evaluation.py`
 
-- `models/embedding/`
-  - `tfidf.py` — `TFIDFEmbedder`
-  - `bert.py` — `BERTEmbedder`
-  - `labse.py` — `LaBSEEmbedder`
-  - `fasttext.py` — `FastTextEmbedder` (optional)
-- `models/classification/`
-  - `logistic_regression.py` — `LogisticRegressionClassifier`
+## Behavior
 
-This allows easy mixing of any embedder with any classifier.
-
-## Supported combinations
-
-- TF-IDF embeddings + Logistic Regression
-- BERT embeddings + Logistic Regression
-- LaBSE embeddings + Logistic Regression
-- FastText embeddings + Logistic Regression (Windows compatibility is limited)
-
-## FastText on Windows
-
-FastText is not reliably installable on native Windows in many environments. If you are on Windows:
-
-- use `TFIDFEmbedder`, `BERTEmbedder`, or `LaBSEEmbedder`
-- or run the project inside WSL / Linux if you need FastText
-
-## Features
-
-- Train on one language, evaluate across multiple languages
-- Shared preprocessing and evaluation pipeline
-- Modular embedder + classifier architecture
+`main.py` trains on one language and evaluates across multiple languages. It prints metrics and writes a summary CSV to `results.csv`, which can be opened in Excel.
 
 ## Usage
 
@@ -49,27 +40,18 @@ Run the main experiment:
 python main.py
 ```
 
-To change the experiment, edit `main.py` and update the chosen embedder and classifier instances.
-
-Example:
-
-```python
-from models.embedding.tfidf import TFIDFEmbedder
-from models.classification.logistic_regression import LogisticRegressionClassifier
-
-embedder = TFIDFEmbedder()
-classifier = LogisticRegressionClassifier()
-```
-
-Then pass them into `ExperimentRunner`.
+To customize experiments, edit `main.py` and swap embedders/classifiers.
 
 ## Repository structure
 
 ```
 NLP/
+├── _multilingual-sentiments/
 ├── models/
 │   ├── classification/
-│   │   └── logistic_regression.py
+│   │   ├── logistic_regression.py
+│   │   ├── mlp.py
+│   │   └── xlmr_head.py
 │   └── embedding/
 │       ├── bert.py
 │       ├── fasttext.py
@@ -83,12 +65,6 @@ NLP/
 ├── requirements.txt
 └── README.md
 ```
-
-## Notes
-
-- Models are configured for CPU execution.
-- The first run may download pretrained models for BERT and LaBSE.
-- Evaluation now suppresses undefined precision warnings by using `zero_division=0` in metric computation.
 
 
 

@@ -203,8 +203,8 @@ def run_all(test_frac,train_frac):
 if __name__ == "__main__":
 
     # CONGIGURABLES
-    TEST_FRACTION = 0.05
-    TRAIN_FRACTION = 0.05
+    TEST_FRACTION = 0.2
+    TRAIN_FRACTION = 0.2
     OUTPUT_PATH = "results.csv"
 
     # Run all experiments and save results to CSV
