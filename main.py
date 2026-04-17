@@ -6,11 +6,13 @@ from utils.load_data import load_data
 from utils.preprocessing import apply_preprocessing, decode_labels
 from utils.evaluation import print_metrics, compute_metrics
 
+import csv
+import os
+
 from models.embedding.tfidf import TFIDFEmbedder
 from models.embedding.bert import BERTEmbedder
 from models.embedding.labse import LaBSEEmbedder
 from models.classification.logistic_regression import LogisticRegressionClassifier
-from models.classification.bilstm import BiLSTMClassifier
 from models.classification.mlp import MLPClassifier
 from models.classification.xlmr_head import XLMRClassifierHead
 
@@ -23,7 +25,7 @@ except ImportError:
     FASTTEXT_AVAILABLE = False
 
 
-class ExperimentRunner:
+class SingleExperimentRunner:
     def __init__(
         self,
         embedder,
@@ -127,18 +129,79 @@ class ExperimentRunner:
         return self.evaluate()
 
 
+def save_results_to_csv(all_results, filepath="results.csv"):
+    fieldnames = [
+        "embedder",
+        "classifier",
+        "train_language",
+        "test_language",
+        "accuracy",
+        "precision",
+        "recall",
+        "f1",
+    ]
+
+    with open(filepath, "w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+
+        for (embedder_name, classifier_name, train_language), results in all_results.items():
+            for test_language, metrics in results.items():
+                row = {
+                    "embedder": embedder_name,
+                    "classifier": classifier_name,
+                    "train_language": train_language,
+                    "test_language": test_language,
+                    "accuracy": metrics.get("accuracy"),
+                    "precision": metrics.get("precision"),
+                    "recall": metrics.get("recall"),
+                    "f1": metrics.get("f1"),
+                }
+                writer.writerow(row)
+
+
+def run_all():
+    """This function calls the main experiment runners:
+    it checks all combinations of embedders and classifiers and saves the results into a dictionary.
+    for every embedder-classifier combination it takes as the train language each of the languages in the dataset and evaluates on all languages.
+    """
+    embedders = [
+        TFIDFEmbedder(),
+        BERTEmbedder(),
+        LaBSEEmbedder(),
+    ]
+
+    if FASTTEXT_AVAILABLE:
+        embedders.append(FastTextEmbedder())
+
+    classifiers = [
+        LogisticRegressionClassifier(),
+        MLPClassifier(),
+        XLMRClassifierHead(),
+    ]
+
+    all_results = {}
+
+    for embedder in embedders:
+        for classifier in classifiers:
+            for train_lang in ["english", "german", "arabic", "portuguese"]:
+                print(f"\nRunning experiment with {type(embedder).__name__} + {type(classifier).__name__} (train language: {train_lang})")
+                runner = SingleExperimentRunner(
+                    embedder=embedder,
+                    classifier=classifier,
+                    train_language=train_lang,
+                    languages=("english", "german", "arabic", "portuguese"),
+                    train_frac=0.05,
+                    test_frac=0.05,
+                )
+                results = runner.run()
+                all_results[(type(embedder).__name__, type(classifier).__name__, train_lang)] = results
+
+    return all_results
+
+
 if __name__ == "__main__":
-
-    embedder = FastTextEmbedder() # TFIDFEmbedder() | BERTEmbedder() | LaBSEEmbedder() | FastTextEmbedder()
-    classifier = BiLSTMClassifier() #  XLMRClassifierHead() | MLPClassifier() | BiLSTMClassifier() | LogisticRegressionClassifier()
-
-    runner = ExperimentRunner(
-        embedder=embedder,
-        classifier=classifier,
-        train_language="english",
-        languages=("english", "german", "arabic", "portuguese"),
-        train_frac=0.05,
-        test_frac=0.05,
-    )
-
-    runner.run()
+    results = run_all()
+    output_path = "results.csv"
+    save_results_to_csv(results, output_path)
+    print(f"\nSaved results to {os.path.abspath(output_path)}")
